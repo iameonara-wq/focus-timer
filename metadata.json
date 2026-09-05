@@ -1,6 +1,6 @@
 {
   "name": "Focus Timer",
-  "description": "Online Pomodoro timer and precision stopwatch web tool with customizable presets, audio alerts, and background tab support.",
+  "description": "Minimalist, distraction-free online Pomodoro timer and stopwatch crafted with Apple HIG aesthetics. Boost deep work and daily focus.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

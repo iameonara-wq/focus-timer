@@ -3,13 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Focus — Apple Style Timer</title>
-    <meta name="description" content="Online Pomodoro timer and precision stopwatch web tool designed with Apple Design System principles. Minimalist, accurate, and distraction-free." />
-    <meta property="og:title" content="Focus — Apple Style Timer" />
-    <meta property="og:description" content="Online Pomodoro timer and precision stopwatch web tool designed with Apple Design System principles." />
+
+    <!-- 1. 타이틀: 핵심 키워드 + 브랜딩 (한/영 병기 추천) -->
+    <title>Focus — Apple Style Pomodoro Timer & Stopwatch | 뽀모도로 타이머</title>
+
+    <!-- 2. 검색 설명문: 검색 엔진 결과 스니펫에 노출 -->
+    <meta name="description" content="Minimalist, distraction-free online Pomodoro timer and stopwatch crafted with Apple HIG aesthetics. Boost deep work and daily focus." />
+    <meta name="keywords" content="Pomodoro Timer, Focus Timer, Online Stopwatch, 뽀모도로 타이머, 집중 타이머, 스톱워치" />
+    <meta name="author" content="Issuepick" />
+
+    <!-- 3. 중복 색인 방지 (Netlify 주소 대신 내 도메인으로 구글 점수 집중) -->
+    <link rel="canonical" href="https://timer.issuepick.com" />
+
+    <!-- 4. SNS / 메신저 공유 카드 (Open Graph) -->
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://timer.issuepick.com" />
+    <meta property="og:title" content="Focus — Apple Style Pomodoro Timer & Stopwatch" />
+    <meta property="og:description" content="Minimalist, distraction-free online Pomodoro timer and stopwatch crafted with Apple design." />
+    <!-- og:image는 필요 시 타이머 캡처 화면이나 심플한 로고 URL을 지정 -->
+    <meta property="og:site_name" content="Focus Timer" />
+
+    <!-- 5. 트위터 / X 카드 -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Focus — Apple Style Pomodoro Timer" />
+    <meta name="twitter:description" content="Minimalist online Pomodoro timer and stopwatch." />
+
+    <!-- 6. 브라우저 및 애플 기기 최적화 -->
     <meta name="theme-color" content="#000000" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%230066cc'/><polygon points='40,32 70,50 40,68' fill='white'/></svg>" />
 
     <!-- Google AdSense SDK -->
@@ -1672,7 +1694,7 @@
           } else if (appState.timer.remainingSeconds < appState.timer.totalSeconds && appState.timer.remainingSeconds > 0) {
             document.title = '[Paused] ' + formatted + ' — Focus';
           } else {
-            document.title = 'Focus — Apple Style Timer';
+            document.title = 'Focus — Apple Style Pomodoro Timer & Stopwatch | 뽀모도로 타이머';
           }
         }
 
