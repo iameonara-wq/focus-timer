@@ -1,0 +1,2138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Focus — Apple Style Timer</title>
+    <meta name="description" content="Online Pomodoro timer and precision stopwatch web tool designed with Apple Design System principles. Minimalist, accurate, and distraction-free." />
+    <meta property="og:title" content="Focus — Apple Style Timer" />
+    <meta property="og:description" content="Online Pomodoro timer and precision stopwatch web tool designed with Apple Design System principles." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%230066cc'/><polygon points='40,32 70,50 40,68' fill='white'/></svg>" />
+
+    <style>
+      /* ==========================================================================
+         Apple Design System Specification
+         ========================================================================== */
+      :root {
+        /* Color Palette */
+        --apple-nav-bg: #000000;
+        --apple-canvas: #ffffff;
+        --apple-parchment: #f5f5f7;
+        --apple-dark-tile: #272729;
+        --apple-dark-tile-subtle: #1d1d1f;
+
+        --apple-ink: #1d1d1f;
+        --apple-ink-secondary: #515154;
+        --apple-text-dark: #ffffff;
+        --apple-text-dark-muted: #cccccc;
+        --apple-fine-print: #7a7a7a;
+
+        --apple-accent: #0066cc; /* Action Blue */
+        --apple-accent-hover: #0055b3;
+        --apple-accent-on-dark: #2997ff;
+        --apple-accent-light: rgba(0, 102, 204, 0.08);
+
+        --apple-focus-ring: 2px solid #0071e3;
+        --apple-border-light: #e5e5e7;
+        --apple-border-dark: #3a3a3c;
+
+        --apple-soft-shadow: 3px 5px 30px rgba(0, 0, 0, 0.22);
+        --apple-display-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+
+        --font-stack: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", sans-serif;
+      }
+
+      /* Dark Mode Palette Overrides */
+      html.dark-theme {
+        --apple-canvas: #161617;
+        --apple-parchment: #000000;
+        --apple-dark-tile: #272729;
+        --apple-ink: #f5f5f7;
+        --apple-ink-secondary: #a1a1a6;
+        --apple-border-light: #2c2c2e;
+        --apple-accent: #2997ff;
+        --apple-accent-hover: #147ce5;
+        --apple-accent-light: rgba(41, 151, 255, 0.12);
+        --apple-display-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+      }
+
+      /* Reset & Base */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        font-family: var(--font-stack);
+        font-size: 17px;
+        line-height: 1.47059;
+        letter-spacing: -0.374px;
+        font-weight: 400;
+        color: var(--apple-ink);
+        background-color: var(--apple-parchment);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        transition: background-color 0.2s ease, color 0.2s ease;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* Tabular figures to prevent layout jitter on countdowns */
+      .tabular-nums {
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* Micro-Interactions on Interactive Elements */
+      button,
+      .apple-pill-btn,
+      .preset-chip,
+      .mode-segmented-btn {
+        touch-action: manipulation;
+        transition: transform 0.1s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+      }
+
+      button:active,
+      .apple-pill-btn:active,
+      .preset-chip:active,
+      .mode-segmented-btn:active {
+        transform: scale(0.95);
+      }
+
+      button:focus-visible,
+      input:focus-visible {
+        outline: var(--apple-focus-ring);
+        outline-offset: 2px;
+      }
+
+      /* ==========================================================================
+         Global Navigation Bar (44px Fixed Height, Pure Black #000000)
+         ========================================================================== */
+      .global-nav {
+        height: 44px;
+        background-color: var(--apple-nav-bg);
+        color: #ffffff;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+      }
+
+      .global-nav-container {
+        width: 100%;
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 0 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: -0.2px;
+      }
+
+      .nav-brand-symbol {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+      }
+
+      .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .nav-icon-btn {
+        background: transparent;
+        border: none;
+        color: #cccccc;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 0;
+      }
+
+      .nav-icon-btn:hover {
+        color: #ffffff;
+      }
+
+      .nav-icon-btn.active {
+        color: var(--apple-accent-on-dark);
+      }
+
+      /* ==========================================================================
+         Main Content Wrapper
+         ========================================================================== */
+      .main-viewport {
+        flex: 1;
+        width: 100%;
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 24px 16px 48px;
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+      }
+
+      /* ==========================================================================
+         AdSense Areas
+         ========================================================================== */
+      .adsense-container {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .adsense-leaderboard {
+        width: 100%;
+        max-width: 728px;
+        min-height: 90px;
+        background-color: var(--apple-canvas);
+        border: 1px solid var(--apple-border-light);
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 16px;
+        text-align: center;
+      }
+
+      .adsense-badge {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--apple-fine-print);
+        margin-bottom: 2px;
+      }
+
+      .adsense-title {
+        font-size: 13px;
+        color: var(--apple-ink-secondary);
+        font-weight: 400;
+      }
+
+      .adsense-subtext {
+        font-size: 11px;
+        color: var(--apple-fine-print);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        margin-top: 2px;
+      }
+
+      .adsense-rectangle {
+        width: 100%;
+        max-width: 728px;
+        min-height: 100px;
+        background-color: var(--apple-canvas);
+        border: 1px solid var(--apple-border-light);
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 16px;
+        text-align: center;
+      }
+
+      /* ==========================================================================
+         Segmented Mode Controls (Pill Segmented Switcher)
+         ========================================================================== */
+      .mode-segmented-bar {
+        display: flex;
+        align-self: center;
+        background-color: var(--apple-canvas);
+        border: 1px solid var(--apple-border-light);
+        border-radius: 9999px;
+        padding: 3px;
+        gap: 2px;
+        width: 100%;
+        max-width: 320px;
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+      }
+
+      .mode-segmented-btn {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: var(--apple-ink-secondary);
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: -0.2px;
+        padding: 8px 16px;
+        border-radius: 9999px;
+        cursor: pointer;
+        white-space: nowrap;
+        text-align: center;
+        transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+      }
+
+      .mode-segmented-btn:hover {
+        color: var(--apple-ink);
+      }
+
+      .mode-segmented-btn.active {
+        background-color: var(--apple-ink);
+        color: var(--apple-text-dark);
+      }
+
+      /* Dark Mode Segmented Controls Overrides */
+      html.dark-theme .mode-segmented-bar {
+        background-color: #1d1d1f;
+        border-color: #333336;
+      }
+
+      html.dark-theme .mode-segmented-btn {
+        color: #a1a1a6;
+      }
+
+      html.dark-theme .mode-segmented-btn:hover {
+        color: #ffffff;
+      }
+
+      html.dark-theme .mode-segmented-btn.active {
+        background-color: #ffffff;
+        color: #1d1d1f !important;
+        font-weight: 600;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+      }
+
+      /* ==========================================================================
+         Main Timer Card Tile (Light Tile #ffffff, border-radius: 18px)
+         ========================================================================== */
+      .hero-timer-tile {
+        background-color: var(--apple-canvas);
+        border: 1px solid var(--apple-border-light);
+        border-radius: 18px;
+        padding: 44px 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 32px;
+        box-shadow: var(--apple-display-shadow);
+        position: relative;
+      }
+
+      /* Dial & Circular SVG Progress Ring */
+      .dial-stage {
+        position: relative;
+        width: 300px;
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .dial-svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+        filter: drop-shadow(var(--apple-soft-shadow));
+      }
+
+      .dial-track {
+        fill: none;
+        stroke: var(--apple-parchment);
+        stroke-width: 6;
+      }
+
+      .dial-bar {
+        fill: none;
+        stroke: var(--apple-accent);
+        stroke-width: 6;
+        stroke-linecap: round;
+        transition: stroke-dashoffset 0.25s linear, stroke 0.2s ease;
+      }
+
+      .dial-metric {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        pointer-events: none;
+      }
+
+      .dial-eyebrow {
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--apple-fine-print);
+        margin-bottom: 6px;
+      }
+
+      .dial-timer-digits {
+        font-size: 64px;
+        font-weight: 600;
+        letter-spacing: -1.2px;
+        line-height: 1;
+        color: var(--apple-ink);
+        white-space: nowrap;
+        transition: font-size 0.2s ease;
+      }
+
+      .dial-timer-digits.has-hours {
+        font-size: 46px;
+        letter-spacing: -0.8px;
+      }
+
+      .dial-status-caption {
+        font-size: 14px;
+        color: var(--apple-ink-secondary);
+        margin-top: 8px;
+        font-weight: 400;
+      }
+
+      /* Control Pill Buttons */
+      .action-pill-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        width: 100%;
+        max-width: 440px;
+        flex-wrap: wrap;
+      }
+
+      /* Primary Action Pill: #0066cc Action Blue */
+      .apple-pill-btn {
+        border-radius: 9999px;
+        font-size: 17px;
+        line-height: 1.47059;
+        letter-spacing: -0.374px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 12px 32px;
+        border: 1px solid transparent;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-decoration: none;
+      }
+
+      .pill-primary {
+        background-color: var(--apple-accent);
+        color: #ffffff;
+        min-width: 140px;
+      }
+
+      .pill-primary:hover {
+        background-color: var(--apple-accent-hover);
+      }
+
+      .pill-secondary {
+        background-color: var(--apple-parchment);
+        color: var(--apple-ink);
+        border: 1px solid var(--apple-border-light);
+        padding: 12px 24px;
+      }
+
+      .pill-secondary:hover {
+        border-color: var(--apple-accent);
+        color: var(--apple-accent);
+      }
+
+      .pill-ghost {
+        background-color: transparent;
+        color: var(--apple-accent);
+        border: 1px solid var(--apple-border-light);
+        padding: 12px 20px;
+        font-size: 15px;
+      }
+
+      .pill-ghost:hover {
+        border-color: var(--apple-accent);
+        background-color: var(--apple-accent-light);
+      }
+
+      /* ==========================================================================
+         Presets Tile (Apple Design System Card Grid)
+         ========================================================================== */
+      .presets-tile {
+        background-color: var(--apple-canvas);
+        color: var(--apple-ink);
+        border: 1px solid var(--apple-border-light);
+        border-radius: 18px;
+        padding: 28px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        box-shadow: var(--apple-display-shadow);
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+      }
+
+      html.dark-theme .presets-tile {
+        background-color: var(--apple-dark-tile);
+        border-color: var(--apple-border-dark);
+        color: var(--apple-text-dark);
+      }
+
+      .presets-tile-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .tile-headline {
+        font-size: 19px;
+        line-height: 1.4211;
+        font-weight: 600;
+        letter-spacing: -0.015em;
+        color: var(--apple-ink);
+      }
+
+      html.dark-theme .tile-headline {
+        color: var(--apple-text-dark);
+      }
+
+      .tile-subheading {
+        font-size: 14px;
+        color: var(--apple-ink-secondary);
+      }
+
+      html.dark-theme .tile-subheading {
+        color: var(--apple-text-dark-muted);
+      }
+
+      .preset-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+      }
+
+      .preset-card {
+        background-color: var(--apple-parchment);
+        border: 1px solid var(--apple-border-light);
+        color: var(--apple-ink);
+        border-radius: 14px;
+        padding: 16px 14px;
+        text-align: left;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        transition: transform 0.1s ease, border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      .preset-card:hover {
+        border-color: var(--apple-accent);
+      }
+
+      .preset-card:active {
+        transform: scale(0.97);
+      }
+
+      .preset-card.active {
+        border-color: var(--apple-accent);
+        background-color: var(--apple-accent-light);
+        box-shadow: 0 0 0 1px var(--apple-accent);
+      }
+
+      .preset-card.active .preset-card-title {
+        color: var(--apple-accent);
+      }
+
+      html.dark-theme .preset-card {
+        background-color: var(--apple-dark-tile-subtle);
+        border-color: var(--apple-border-dark);
+        color: var(--apple-text-dark);
+      }
+
+      html.dark-theme .preset-card:hover {
+        border-color: var(--apple-accent-on-dark);
+      }
+
+      html.dark-theme .preset-card.active {
+        background-color: rgba(41, 151, 255, 0.14);
+        border-color: var(--apple-accent-on-dark);
+        box-shadow: 0 0 0 1px var(--apple-accent-on-dark);
+      }
+
+      html.dark-theme .preset-card.active .preset-card-title {
+        color: var(--apple-accent-on-dark);
+      }
+
+      .preset-card-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+      }
+
+      .preset-card-title {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: -0.2px;
+      }
+
+      .preset-card-icon {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        stroke: currentColor;
+        transition: stroke 0.15s ease, transform 0.15s ease;
+      }
+
+      .preset-card:hover .preset-card-icon {
+        transform: scale(1.06);
+      }
+
+      .preset-card-badge {
+        font-size: 12px;
+        font-weight: 600;
+        background-color: var(--apple-canvas);
+        border: 1px solid var(--apple-border-light);
+        border-radius: 9999px;
+        padding: 2px 8px;
+        color: var(--apple-ink-secondary);
+        font-variant-numeric: tabular-nums;
+      }
+
+      html.dark-theme .preset-card-badge {
+        background-color: #000000;
+        border-color: var(--apple-border-dark);
+        color: var(--apple-text-dark-muted);
+      }
+
+      .preset-card-desc {
+        font-size: 12px;
+        color: var(--apple-ink-secondary);
+        font-weight: 400;
+      }
+
+      html.dark-theme .preset-card-desc {
+        color: var(--apple-text-dark-muted);
+      }
+
+      /* ==========================================================================
+         Custom Timer Section (#ffffff Canvas / #272729 Dark Tile)
+         ========================================================================== */
+      .custom-timer-tile {
+        background-color: var(--apple-canvas);
+        border: 1px solid var(--apple-border-light);
+        border-radius: 18px;
+        padding: 32px 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 26px;
+        box-shadow: var(--apple-display-shadow);
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+      }
+
+      html.dark-theme .custom-timer-tile {
+        background-color: var(--apple-dark-tile);
+        border-color: var(--apple-border-dark);
+      }
+
+      .custom-timer-header {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .custom-timer-headline {
+        font-size: 21px;
+        font-weight: 600;
+        letter-spacing: -0.015em;
+        color: var(--apple-ink);
+      }
+
+      html.dark-theme .custom-timer-headline {
+        color: var(--apple-text-dark);
+      }
+
+      .custom-timer-subheadline {
+        font-size: 14px;
+        color: var(--apple-ink-secondary);
+        font-weight: 400;
+      }
+
+      html.dark-theme .custom-timer-subheadline {
+        color: var(--apple-text-dark-muted);
+      }
+
+      /* 3-Card Time Input Box (Hours : Minutes : Seconds) */
+      .custom-clock-inputs-wrapper {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 12px;
+      }
+
+      .time-unit-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .time-unit-card {
+        width: 88px;
+        height: 88px;
+        background-color: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 16px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.2s ease;
+      }
+
+      html.dark-theme .time-unit-card {
+        background-color: #1d1d1f;
+        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+      }
+
+      .time-unit-card:focus-within {
+        border-color: var(--apple-accent);
+        box-shadow: 0 0 0 3px var(--apple-accent-light);
+      }
+
+      html.dark-theme .time-unit-card:focus-within {
+        border-color: var(--apple-accent-on-dark);
+        box-shadow: 0 0 0 3px rgba(41, 151, 255, 0.25);
+      }
+
+      .time-unit-input {
+        width: 100%;
+        height: 100%;
+        border: none;
+        background: transparent;
+        outline: none;
+        text-align: center;
+        font-family: var(--font-stack);
+        font-size: 34px;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        color: var(--apple-ink);
+        padding: 0;
+      }
+
+      html.dark-theme .time-unit-input {
+        color: #ffffff;
+      }
+
+      /* Hide Default Number Spin Arrows */
+      .time-unit-input::-webkit-inner-spin-button,
+      .time-unit-input::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      .time-unit-input {
+        -moz-appearance: textfield;
+      }
+
+      .time-separator {
+        font-size: 34px;
+        font-weight: 600;
+        line-height: 88px;
+        color: var(--apple-accent);
+        user-select: none;
+      }
+
+      html.dark-theme .time-separator {
+        color: var(--apple-accent-on-dark);
+      }
+
+      .time-unit-label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--apple-fine-print);
+      }
+
+      /* Optional Timer Label Group */
+      .custom-label-group {
+        width: 100%;
+        max-width: 380px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .custom-label-text {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--apple-ink-secondary);
+      }
+
+      html.dark-theme .custom-label-text {
+        color: var(--apple-text-dark-muted);
+      }
+
+      .custom-label-input {
+        width: 100%;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-size: 15px;
+        font-family: var(--font-stack);
+        background-color: var(--apple-parchment);
+        border: 1px solid var(--apple-border-light);
+        color: var(--apple-ink);
+        outline: none;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      .custom-label-input:focus {
+        border-color: var(--apple-accent);
+        box-shadow: 0 0 0 3px var(--apple-accent-light);
+      }
+
+      html.dark-theme .custom-label-input {
+        background-color: #1d1d1f;
+        border-color: var(--apple-border-dark);
+        color: #ffffff;
+      }
+
+      html.dark-theme .custom-label-input:focus {
+        border-color: var(--apple-accent-on-dark);
+        box-shadow: 0 0 0 3px rgba(41, 151, 255, 0.25);
+      }
+
+      .custom-timer-action-row {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+      }
+
+      /* ==========================================================================
+         Precision Stopwatch View
+         ========================================================================== */
+      .stopwatch-tile {
+        display: none;
+        background-color: var(--apple-canvas);
+        border: 1px solid var(--apple-border-light);
+        border-radius: 18px;
+        padding: 44px 24px;
+        flex-direction: column;
+        align-items: center;
+        gap: 32px;
+        box-shadow: var(--apple-display-shadow);
+      }
+
+      .stopwatch-tile.active {
+        display: flex;
+      }
+
+      .stopwatch-readout {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        color: var(--apple-ink);
+        line-height: 1;
+      }
+
+      .sw-major-digits {
+        font-size: 72px;
+        font-weight: 600;
+        letter-spacing: -1.5px;
+      }
+
+      .sw-minor-digits {
+        font-size: 38px;
+        font-weight: 600;
+        letter-spacing: -0.5px;
+        color: var(--apple-accent);
+        margin-left: 2px;
+      }
+
+      /* Lap Times Table (Clean Apple List) */
+      .lap-table-wrapper {
+        width: 100%;
+        max-width: 520px;
+        background-color: var(--apple-parchment);
+        border: 1px solid var(--apple-border-light);
+        border-radius: 14px;
+        overflow: hidden;
+        display: none;
+      }
+
+      .lap-table-wrapper.has-laps {
+        display: block;
+      }
+
+      .lap-table-header {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 18px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--apple-fine-print);
+        border-bottom: 1px solid var(--apple-border-light);
+      }
+
+      .lap-rows-scroll {
+        max-height: 220px;
+        overflow-y: auto;
+      }
+
+      .lap-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 18px;
+        font-size: 15px;
+        font-weight: 400;
+        border-bottom: 1px solid var(--apple-border-light);
+        color: var(--apple-ink);
+      }
+
+      .lap-row:last-child {
+        border-bottom: none;
+      }
+
+      .lap-row.fastest {
+        color: #34c759; /* Apple Green */
+        font-weight: 600;
+      }
+
+      .lap-row.slowest {
+        color: #ff3b30; /* Apple Red */
+        font-weight: 600;
+      }
+
+      /* ==========================================================================
+         Footer (#f5f5f7, 12px Fine-print, Restrained Layout)
+         ========================================================================== */
+      .apple-footer {
+        background-color: var(--apple-parchment);
+        border-top: 1px solid var(--apple-border-light);
+        padding: 24px 16px 36px;
+        margin-top: auto;
+      }
+
+      .footer-inner {
+        max-width: 980px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--apple-fine-print);
+      }
+
+      .footer-shortcuts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        color: var(--apple-ink-secondary);
+        font-size: 12px;
+      }
+
+      .kbd-key {
+        font-family: var(--font-stack);
+        font-weight: 600;
+        color: var(--apple-ink);
+        background: var(--apple-canvas);
+        border: 1px solid var(--apple-border-light);
+        border-radius: 4px;
+        padding: 2px 6px;
+      }
+
+      .footer-legal {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        padding-top: 12px;
+        border-top: 1px solid var(--apple-border-light);
+      }
+
+      .footer-links {
+        display: flex;
+        gap: 16px;
+      }
+
+      .footer-link {
+        color: var(--apple-fine-print);
+        text-decoration: none;
+      }
+
+      .footer-link:hover {
+        color: var(--apple-ink);
+        text-decoration: underline;
+      }
+
+      /* ==========================================================================
+         Responsive Breakpoints
+         ========================================================================== */
+      @media (max-width: 640px) {
+        .hero-timer-tile,
+        .stopwatch-tile,
+        .presets-tile,
+        .custom-timer-tile {
+          padding: 24px 16px;
+        }
+
+        .dial-stage {
+          width: 250px;
+          height: 250px;
+        }
+
+        .dial-timer-digits {
+          font-size: 52px;
+        }
+
+        .dial-timer-digits.has-hours {
+          font-size: 38px;
+        }
+
+        .preset-cards-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+        }
+
+        .time-unit-card {
+          width: 76px;
+          height: 76px;
+          border-radius: 14px;
+        }
+
+        .time-unit-input {
+          font-size: 28px;
+        }
+
+        .time-separator {
+          font-size: 28px;
+          line-height: 76px;
+        }
+
+        .sw-major-digits {
+          font-size: 56px;
+        }
+
+        .sw-minor-digits {
+          font-size: 30px;
+        }
+
+        .action-pill-row {
+          flex-direction: column;
+          width: 100%;
+        }
+
+        .action-pill-row > button {
+          width: 100%;
+        }
+
+        .footer-legal {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ==========================================================================
+         Global Navigation (44px Fixed Height, #000000)
+         ========================================================================== -->
+    <header class="global-nav" id="apple-nav">
+      <div class="global-nav-container">
+        <a href="#" class="nav-brand" id="nav-brand-link">
+          <div class="nav-brand-symbol" aria-hidden="true">⏱</div>
+          <span>Focus Timer</span>
+        </a>
+
+        <div class="nav-actions">
+          <!-- Notification Alert Toggle -->
+          <button id="btn-toggle-notification" class="nav-icon-btn" title="Enable Desktop Notifications" aria-label="Desktop Notifications">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+          </button>
+
+          <!-- Audio Chime Toggle -->
+          <button id="btn-toggle-sound" class="nav-icon-btn active" title="Mute / Unmute Audio Chime" aria-label="Audio Alert">
+            <svg id="icon-sound-on" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+            <svg id="icon-sound-off" style="display: none;" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <line x1="23" y1="9" x2="17" y2="15"></line>
+              <line x1="17" y1="9" x2="23" y2="15"></line>
+            </svg>
+          </button>
+
+          <!-- Theme Appearance Toggle -->
+          <button id="btn-toggle-theme" class="nav-icon-btn" title="Toggle Appearance" aria-label="Appearance Mode">
+            <svg id="icon-theme-dark" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+            <svg id="icon-theme-light" style="display: none;" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-viewport">
+      <!-- ==========================================================================
+           GOOGLE ADSENSE TOP LEADERBOARD (728x90)
+           ========================================================================== -->
+      <section class="adsense-container" id="adsense-top-slot" aria-label="Advertisement Banner">
+        <!-- 
+        To insert live AdSense script:
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:728px;height:90px"
+             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+             data-ad-slot="XXXXXXXXXX"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        -->
+        <div class="adsense-leaderboard" id="ad-placeholder-top">
+          <span class="adsense-badge">Advertisement</span>
+          <span class="adsense-title">Google AdSense Leaderboard (728 × 90 Responsive)</span>
+          <span class="adsense-subtext">&lt;!-- GOOGLE ADSENSE TOP LEADERBOARD (728x90) --&gt;</span>
+        </div>
+      </section>
+
+      <!-- Mode Segmented Control Bar -->
+      <nav class="mode-segmented-bar" id="mode-selector" aria-label="Timer Mode Switcher">
+        <button id="btn-mode-pomodoro" class="mode-segmented-btn active" type="button">
+          Pomodoro Timer
+        </button>
+        <button id="btn-mode-stopwatch" class="mode-segmented-btn" type="button">
+          Stopwatch
+        </button>
+      </nav>
+
+      <!-- ==========================================================================
+           HERO SECTION: Pomodoro Timer Tile (#ffffff Canvas, border-radius: 18px)
+           ========================================================================== -->
+      <section class="hero-timer-tile" id="view-pomodoro">
+        <!-- Circular SVG Progress Ring with Action Blue #0066cc Stroke -->
+        <div class="dial-stage" id="dial-stage-wrapper">
+          <svg class="dial-svg" viewBox="0 0 100 100">
+            <circle class="dial-track" cx="50" cy="50" r="44"></circle>
+            <circle id="timer-svg-ring" class="dial-bar" cx="50" cy="50" r="44" stroke-dasharray="276.46" stroke-dashoffset="0"></circle>
+          </svg>
+          <div class="dial-metric">
+            <span class="dial-eyebrow" id="active-mode-label">Pomodoro</span>
+            <div class="dial-timer-digits tabular-nums" id="timer-display-clock">25:00</div>
+            <span class="dial-status-caption" id="timer-state-caption">Ready to focus</span>
+          </div>
+        </div>
+
+        <!-- Main Action Pill Buttons -->
+        <div class="action-pill-row">
+          <button id="btn-timer-primary" class="apple-pill-btn pill-primary" type="button">
+            <span id="btn-timer-primary-label">Start Focus</span>
+          </button>
+          <button id="btn-timer-reset" class="apple-pill-btn pill-secondary" type="button">
+            Reset
+          </button>
+          <button id="btn-timer-extend" class="apple-pill-btn pill-ghost" type="button" title="Add 5 Minutes">
+            +5 Min
+          </button>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           STOPWATCH VIEW (#ffffff Canvas, border-radius: 18px)
+           ========================================================================== -->
+      <section class="stopwatch-tile" id="view-stopwatch">
+        <span class="dial-eyebrow">Precision Chronometer</span>
+        
+        <!-- Large SF Pro Monospace Readout -->
+        <div class="stopwatch-readout tabular-nums">
+          <span class="sw-major-digits" id="sw-major-readout">00:00</span>
+          <span class="sw-minor-digits" id="sw-minor-readout">.00</span>
+        </div>
+
+        <!-- Stopwatch Action Row -->
+        <div class="action-pill-row">
+          <button id="btn-sw-primary" class="apple-pill-btn pill-primary" type="button">
+            <span id="btn-sw-primary-label">Start</span>
+          </button>
+          <button id="btn-sw-lap" class="apple-pill-btn pill-secondary" type="button" disabled>
+            Lap
+          </button>
+          <button id="btn-sw-reset" class="apple-pill-btn pill-secondary" type="button">
+            Reset
+          </button>
+        </div>
+
+        <!-- Laps Table -->
+        <div class="lap-table-wrapper" id="lap-table-box">
+          <div class="lap-table-header">
+            <span>Lap #</span>
+            <span>Split</span>
+            <span>Total Time</span>
+          </div>
+          <div class="lap-rows-scroll tabular-nums" id="lap-rows-container">
+            <!-- Dynamically populated laps -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           PRESETS TILE (Apple Design System Card Grid)
+           ========================================================================== -->
+      <section class="presets-tile" id="presets-card">
+        <div class="presets-tile-header">
+          <div>
+            <h2 class="tile-headline">Focus Presets</h2>
+            <p class="tile-subheading">One-tap intervals engineered for cognitive stamina.</p>
+          </div>
+        </div>
+
+        <!-- 4-Card Preset Grid with Apple SF Symbols Style Icons -->
+        <div class="preset-cards-grid" id="presets-button-group">
+          <!-- 1. Pomodoro (25m): SF Symbol Timer/Focus Clock -->
+          <button class="preset-card active" data-mins="25" data-title="Pomodoro" type="button" aria-label="Pomodoro 25 Minutes">
+            <div class="preset-card-top">
+              <span class="preset-card-title">
+                <svg class="preset-card-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="13" r="8"></circle>
+                  <path d="M12 2v3"></path>
+                  <path d="M10 2h4"></path>
+                  <path d="M18 7l-1.4 1.4"></path>
+                  <path d="M12 9v4l2.5 1.5"></path>
+                </svg>
+                <span>Pomodoro</span>
+              </span>
+              <span class="preset-card-badge">25m</span>
+            </div>
+            <div class="preset-card-desc">Classic focus block</div>
+          </button>
+
+          <!-- 2. Short Break (5m): SF Symbol Coffee Cup with Steam -->
+          <button class="preset-card" data-mins="5" data-title="Short Break" type="button" aria-label="Short Break 5 Minutes">
+            <div class="preset-card-top">
+              <span class="preset-card-title">
+                <svg class="preset-card-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M17 8h1a3 3 0 0 1 0 6h-1"></path>
+                  <path d="M4 8h13v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V8z"></path>
+                  <path d="M8 2.5c.5 1-.5 2 0 3"></path>
+                  <path d="M12 2c.5 1-.5 2 0 3"></path>
+                  <path d="M3 20h15"></path>
+                </svg>
+                <span>Short Break</span>
+              </span>
+              <span class="preset-card-badge">5m</span>
+            </div>
+            <div class="preset-card-desc">Quick mental reset</div>
+          </button>
+
+          <!-- 3. Long Break (15m): SF Symbol Armchair / Rest -->
+          <button class="preset-card" data-mins="15" data-title="Long Break" type="button" aria-label="Long Break 15 Minutes">
+            <div class="preset-card-top">
+              <span class="preset-card-title">
+                <svg class="preset-card-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M6 19V9a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v10"></path>
+                  <path d="M3 11a2 2 0 0 1 2-2h1v9H5a2 2 0 0 1-2-2v-5z"></path>
+                  <path d="M18 9h1a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1V9z"></path>
+                  <path d="M6 15h12"></path>
+                  <path d="M6 19v3"></path>
+                  <path d="M18 19v3"></path>
+                </svg>
+                <span>Long Break</span>
+              </span>
+              <span class="preset-card-badge">15m</span>
+            </div>
+            <div class="preset-card-desc">Full rest & recovery</div>
+          </button>
+
+          <!-- 4. Deep Work (50m): SF Symbol Brain / High Focus -->
+          <button class="preset-card" data-mins="50" data-title="Deep Work" type="button" aria-label="Deep Work 50 Minutes">
+            <div class="preset-card-top">
+              <span class="preset-card-title">
+                <svg class="preset-card-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"></path>
+                  <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"></path>
+                  <path d="M12 5v13"></path>
+                </svg>
+                <span>Deep Work</span>
+              </span>
+              <span class="preset-card-badge">50m</span>
+            </div>
+            <div class="preset-card-desc">Extended flow state</div>
+          </button>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           CUSTOM TIMER SECTION (H : M : S Inputs, Label, & Set Action)
+           ========================================================================== -->
+      <section class="custom-timer-tile" id="custom-timer-card">
+        <div class="custom-timer-header">
+          <h2 class="custom-timer-headline">Custom Timer</h2>
+          <p class="custom-timer-subheadline">Set your exact duration by hours, minutes, and seconds.</p>
+        </div>
+
+        <!-- 3-Card Time Input Box (Hours : Minutes : Seconds) -->
+        <div class="custom-clock-inputs-wrapper">
+          <!-- Hours Unit -->
+          <div class="time-unit-group">
+            <div class="time-unit-card" title="Hours (0-99)">
+              <input
+                type="number"
+                id="custom-input-hours"
+                class="time-unit-input tabular-nums"
+                min="0"
+                max="99"
+                value="00"
+                placeholder="00"
+                aria-label="Hours"
+              />
+            </div>
+            <span class="time-unit-label">HOURS</span>
+          </div>
+
+          <!-- Separator 1 -->
+          <div class="time-separator" aria-hidden="true">:</div>
+
+          <!-- Minutes Unit -->
+          <div class="time-unit-group">
+            <div class="time-unit-card" title="Minutes (0-59)">
+              <input
+                type="number"
+                id="custom-input-minutes"
+                class="time-unit-input tabular-nums"
+                min="0"
+                max="59"
+                value="25"
+                placeholder="00"
+                aria-label="Minutes"
+              />
+            </div>
+            <span class="time-unit-label">MINUTES</span>
+          </div>
+
+          <!-- Separator 2 -->
+          <div class="time-separator" aria-hidden="true">:</div>
+
+          <!-- Seconds Unit -->
+          <div class="time-unit-group">
+            <div class="time-unit-card" title="Seconds (0-59)">
+              <input
+                type="number"
+                id="custom-input-seconds"
+                class="time-unit-input tabular-nums"
+                min="0"
+                max="59"
+                value="00"
+                placeholder="00"
+                aria-label="Seconds"
+              />
+            </div>
+            <span class="time-unit-label">SECONDS</span>
+          </div>
+        </div>
+
+        <!-- Optional Timer Label Input -->
+        <div class="custom-label-group">
+          <label for="custom-input-task-name" class="custom-label-text">Timer Label (Optional)</label>
+          <input
+            type="text"
+            id="custom-input-task-name"
+            class="custom-label-input"
+            placeholder="Task Sprint, Workout, Reading..."
+            maxlength="32"
+          />
+        </div>
+
+        <!-- Set Custom Timer Action Button -->
+        <div class="custom-timer-action-row">
+          <button id="btn-set-custom-timer" class="apple-pill-btn pill-primary" type="button">
+            Set Custom Timer
+          </button>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           GOOGLE ADSENSE BOTTOM RECTANGLE (Responsive 300x250 or 728x90)
+           ========================================================================== -->
+      <section class="adsense-container" id="adsense-bottom-slot" aria-label="Advertisement Display">
+        <!-- 
+        To insert live AdSense script:
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+             data-ad-slot="XXXXXXXXXX"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        -->
+        <div class="adsense-rectangle" id="ad-placeholder-bottom">
+          <span class="adsense-badge">Advertisement</span>
+          <span class="adsense-title">Google AdSense Responsive Unit (300 × 250 or Responsive Display)</span>
+          <span class="adsense-subtext">&lt;!-- GOOGLE ADSENSE BOTTOM RECTANGLE --&gt;</span>
+        </div>
+      </section>
+    </main>
+
+    <!-- ==========================================================================
+         Footer (#f5f5f7 Parchment, 12px Fine-print)
+         ========================================================================== -->
+    <footer class="apple-footer">
+      <div class="footer-inner">
+        <div class="footer-shortcuts">
+          <span>Keyboard:</span>
+          <span><span class="kbd-key">Space</span> Start / Pause</span>
+          <span><span class="kbd-key">R</span> Reset</span>
+          <span><span class="kbd-key">L</span> Lap Record</span>
+        </div>
+        <div class="footer-legal">
+          <span>Copyright © 2026 Focus Timer. All rights reserved. Built with Apple Web Design System principles.</span>
+          <div class="footer-links">
+            <span class="footer-link">Pure Offline-Ready</span>
+            <span class="footer-link">Drift-Free Precision</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- ==========================================================================
+         Client Engine (Vanilla JavaScript, 100% Self-Contained)
+         ========================================================================== -->
+    <script>
+      (function () {
+        'use strict';
+
+        // --- Web Audio API: Apple-Style Harmonic Chime ---
+        let audioContext = null;
+
+        function initAudioContext() {
+          if (!audioContext) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) {
+              audioContext = new AudioCtx();
+            }
+          }
+          if (audioContext && audioContext.state === 'suspended') {
+            audioContext.resume();
+          }
+          return audioContext;
+        }
+
+        function playAppleChime() {
+          if (!appState.soundEnabled) return;
+          try {
+            const ctx = initAudioContext();
+            if (!ctx) return;
+
+            const t = ctx.currentTime;
+            // Clean, soft pentatonic chime: F5 (698.46 Hz) -> A5 (880.00 Hz) -> C6 (1046.50 Hz)
+            const chords = [
+              { freq: 698.46, delay: 0, dur: 0.5 },
+              { freq: 880.00, delay: 0.12, dur: 0.6 },
+              { freq: 1046.50, delay: 0.24, dur: 0.9 }
+            ];
+
+            chords.forEach(function (chord) {
+              const osc = ctx.createOscillator();
+              const gain = ctx.createGain();
+
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(chord.freq, t + chord.delay);
+
+              // Organic bell envelope
+              gain.gain.setValueAtTime(0.0001, t + chord.delay);
+              gain.gain.exponentialRampToValueAtTime(0.24, t + chord.delay + 0.03);
+              gain.gain.exponentialRampToValueAtTime(0.0001, t + chord.delay + chord.dur);
+
+              osc.connect(gain);
+              gain.connect(ctx.destination);
+
+              osc.start(t + chord.delay);
+              osc.stop(t + chord.delay + chord.dur + 0.05);
+            });
+          } catch (e) {
+            console.error('Audio engine exception:', e);
+          }
+        }
+
+        // --- Desktop Notification Manager ---
+        function requestNotifications() {
+          if (!('Notification' in window)) return;
+          Notification.requestPermission().then(function (perm) {
+            updateNotificationIcon(perm === 'granted');
+          });
+        }
+
+        function triggerNotification(title, message) {
+          if (!('Notification' in window) || Notification.permission !== 'granted') return;
+          try {
+            new Notification(title, {
+              body: message,
+              icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="%230066cc"/><polygon points="40,32 70,50 40,68" fill="white"/></svg>'
+            });
+          } catch (err) {
+            console.error('Notification dispatch error:', err);
+          }
+        }
+
+        function updateNotificationIcon(isGranted) {
+          const btn = document.getElementById('btn-toggle-notification');
+          if (isGranted) {
+            btn.classList.add('active');
+            btn.title = 'Desktop notifications active';
+          } else {
+            btn.classList.remove('active');
+            btn.title = 'Enable desktop notifications';
+          }
+        }
+
+        // --- State Management ---
+        const CIRCUMFERENCE = 2 * Math.PI * 44; // ~276.46 for r=44
+
+        const appState = {
+          currentTab: 'pomodoro', // 'pomodoro' | 'stopwatch'
+          theme: localStorage.getItem('apple_timer_theme') || 'light',
+          soundEnabled: localStorage.getItem('apple_timer_sound') !== 'false',
+
+          // Timer (Drift-Free timestamp delta)
+          timer: {
+            title: 'Pomodoro',
+            totalSeconds: 25 * 60,
+            remainingSeconds: 25 * 60,
+            isRunning: false,
+            endTime: 0,
+            animationFrame: null
+          },
+
+          // Stopwatch (Drift-Free centisecond precision)
+          stopwatch: {
+            isRunning: false,
+            startTime: 0,
+            elapsedTime: 0,
+            lastLapTime: 0,
+            laps: [],
+            animationFrame: null
+          }
+        };
+
+        // --- DOM Cache ---
+        const htmlElement = document.documentElement;
+        const btnModePomodoro = document.getElementById('btn-mode-pomodoro');
+        const btnModeStopwatch = document.getElementById('btn-mode-stopwatch');
+        const viewPomodoro = document.getElementById('view-pomodoro');
+        const viewStopwatch = document.getElementById('view-stopwatch');
+        const presetsCard = document.getElementById('presets-card');
+        const customTimerCard = document.getElementById('custom-timer-card');
+
+        // Navigation Controls
+        const btnToggleTheme = document.getElementById('btn-toggle-theme');
+        const iconThemeDark = document.getElementById('icon-theme-dark');
+        const iconThemeLight = document.getElementById('icon-theme-light');
+        const btnToggleSound = document.getElementById('btn-toggle-sound');
+        const iconSoundOn = document.getElementById('icon-sound-on');
+        const iconSoundOff = document.getElementById('icon-sound-off');
+        const btnToggleNotification = document.getElementById('btn-toggle-notification');
+
+        // Timer Elements
+        const timerSvgRing = document.getElementById('timer-svg-ring');
+        const activeModeLabel = document.getElementById('active-mode-label');
+        const timerDisplayClock = document.getElementById('timer-display-clock');
+        const timerStateCaption = document.getElementById('timer-state-caption');
+        const btnTimerPrimary = document.getElementById('btn-timer-primary');
+        const btnTimerPrimaryLabel = document.getElementById('btn-timer-primary-label');
+        const btnTimerReset = document.getElementById('btn-timer-reset');
+        const btnTimerExtend = document.getElementById('btn-timer-extend');
+
+        // Preset and Custom Timer Controls
+        const presetCards = document.querySelectorAll('.preset-card[data-mins]');
+        const customInputHours = document.getElementById('custom-input-hours');
+        const customInputMinutes = document.getElementById('custom-input-minutes');
+        const customInputSeconds = document.getElementById('custom-input-seconds');
+        const customInputTaskName = document.getElementById('custom-input-task-name');
+        const btnSetCustomTimer = document.getElementById('btn-set-custom-timer');
+
+        // Stopwatch Elements
+        const swMajorReadout = document.getElementById('sw-major-readout');
+        const swMinorReadout = document.getElementById('sw-minor-readout');
+        const btnSwPrimary = document.getElementById('btn-sw-primary');
+        const btnSwPrimaryLabel = document.getElementById('btn-sw-primary-label');
+        const btnSwLap = document.getElementById('btn-sw-lap');
+        const btnSwReset = document.getElementById('btn-sw-reset');
+        const lapTableBox = document.getElementById('lap-table-box');
+        const lapRowsContainer = document.getElementById('lap-rows-container');
+
+        // --- Formatting Functions ---
+        function zeroPad(n, width) {
+          width = width || 2;
+          let str = String(n);
+          while (str.length < width) str = '0' + str;
+          return str;
+        }
+
+        function formatClock(seconds) {
+          const h = Math.floor(seconds / 3600);
+          const m = Math.floor((seconds % 3600) / 60);
+          const s = Math.floor(seconds % 60);
+          if (h > 0 || appState.timer.totalSeconds >= 3600) {
+            return zeroPad(h) + ':' + zeroPad(m) + ':' + zeroPad(s);
+          }
+          return zeroPad(m) + ':' + zeroPad(s);
+        }
+
+        function formatStopwatchDigits(ms) {
+          const totalCentiseconds = Math.floor(ms / 10);
+          const centis = totalCentiseconds % 100;
+          const totalSecs = Math.floor(totalCentiseconds / 100);
+          const secs = totalSecs % 60;
+          const mins = Math.floor(totalSecs / 60);
+          const hours = Math.floor(mins / 60);
+
+          let major = '';
+          if (hours > 0) {
+            major = zeroPad(hours) + ':' + zeroPad(mins % 60) + ':' + zeroPad(secs);
+          } else {
+            major = zeroPad(mins) + ':' + zeroPad(secs);
+          }
+
+          return {
+            major: major,
+            minor: '.' + zeroPad(centis)
+          };
+        }
+
+        // --- Theme Engine ---
+        function applyTheme(theme) {
+          appState.theme = theme;
+          localStorage.setItem('apple_timer_theme', theme);
+          if (theme === 'dark') {
+            htmlElement.classList.add('dark-theme');
+            iconThemeDark.style.display = 'none';
+            iconThemeLight.style.display = 'block';
+          } else {
+            htmlElement.classList.remove('dark-theme');
+            iconThemeDark.style.display = 'block';
+            iconThemeLight.style.display = 'none';
+          }
+        }
+
+        btnToggleTheme.addEventListener('click', function () {
+          applyTheme(appState.theme === 'light' ? 'dark' : 'light');
+        });
+
+        // --- Sound Toggle ---
+        function setSoundEnabled(val) {
+          appState.soundEnabled = val;
+          localStorage.setItem('apple_timer_sound', String(val));
+          if (val) {
+            btnToggleSound.classList.add('active');
+            iconSoundOn.style.display = 'block';
+            iconSoundOff.style.display = 'none';
+          } else {
+            btnToggleSound.classList.remove('active');
+            iconSoundOn.style.display = 'none';
+            iconSoundOff.style.display = 'block';
+          }
+        }
+
+        btnToggleSound.addEventListener('click', function () {
+          setSoundEnabled(!appState.soundEnabled);
+          if (appState.soundEnabled) {
+            playAppleChime();
+          }
+        });
+
+        // --- Notification Button ---
+        btnToggleNotification.addEventListener('click', function () {
+          if ('Notification' in window) {
+            if (Notification.permission === 'granted') {
+              triggerNotification('Focus Timer', 'Desktop alerts are active and synchronized.');
+            } else {
+              requestNotifications();
+            }
+          }
+        });
+
+        // --- Tab Switching ---
+        function switchTab(mode) {
+          appState.currentTab = mode;
+          if (mode === 'pomodoro') {
+            btnModePomodoro.classList.add('active');
+            btnModeStopwatch.classList.remove('active');
+            viewPomodoro.style.display = 'flex';
+            viewStopwatch.classList.remove('active');
+            presetsCard.style.display = 'flex';
+            if (customTimerCard) customTimerCard.style.display = 'flex';
+            updatePageTitle();
+          } else {
+            btnModeStopwatch.classList.add('active');
+            btnModePomodoro.classList.remove('active');
+            viewPomodoro.style.display = 'none';
+            viewStopwatch.classList.add('active');
+            presetsCard.style.display = 'none';
+            if (customTimerCard) customTimerCard.style.display = 'none';
+            updateStopwatchTitle();
+          }
+        }
+
+        btnModePomodoro.addEventListener('click', function () { switchTab('pomodoro'); });
+        btnModeStopwatch.addEventListener('click', function () { switchTab('stopwatch'); });
+
+        // --- Title Sync Engine ---
+        function updatePageTitle() {
+          if (appState.currentTab !== 'pomodoro') return;
+          const formatted = formatClock(appState.timer.remainingSeconds);
+          if (appState.timer.isRunning) {
+            document.title = '(' + formatted + ') ' + appState.timer.title + ' — Focus';
+          } else if (appState.timer.remainingSeconds < appState.timer.totalSeconds && appState.timer.remainingSeconds > 0) {
+            document.title = '[Paused] ' + formatted + ' — Focus';
+          } else {
+            document.title = 'Focus — Apple Style Timer';
+          }
+        }
+
+        function updateStopwatchTitle() {
+          if (appState.currentTab !== 'stopwatch') return;
+          if (appState.stopwatch.isRunning) {
+            const timeObj = formatStopwatchDigits(appState.stopwatch.elapsedTime);
+            document.title = timeObj.major + timeObj.minor + ' — Stopwatch';
+          } else {
+            document.title = 'Stopwatch — Focus';
+          }
+        }
+
+        // --- Timer Core Engine (Drift-Free Date.now()) ---
+        function updateTimerUI() {
+          const remaining = Math.max(0, appState.timer.remainingSeconds);
+          timerDisplayClock.textContent = formatClock(remaining);
+
+          if (appState.timer.totalSeconds >= 3600) {
+            timerDisplayClock.classList.add('has-hours');
+          } else {
+            timerDisplayClock.classList.remove('has-hours');
+          }
+
+          // SVG Ring calculation
+          const total = appState.timer.totalSeconds;
+          const progressRatio = total > 0 ? (remaining / total) : 0;
+          const offset = CIRCUMFERENCE * (1 - Math.max(0, Math.min(1, progressRatio)));
+          timerSvgRing.style.strokeDashoffset = offset.toFixed(2);
+
+          updatePageTitle();
+        }
+
+        function timerLoop() {
+          if (!appState.timer.isRunning) return;
+
+          const now = Date.now();
+          const msLeft = appState.timer.endTime - now;
+          const secondsLeft = Math.ceil(msLeft / 1000);
+
+          if (secondsLeft <= 0) {
+            appState.timer.remainingSeconds = 0;
+            appState.timer.isRunning = false;
+            updateTimerUI();
+
+            timerStateCaption.textContent = 'Session Completed';
+            btnTimerPrimaryLabel.textContent = 'Start Focus';
+            btnTimerPrimary.classList.remove('pill-secondary');
+            btnTimerPrimary.classList.add('pill-primary');
+
+            // Complete alert
+            playAppleChime();
+            triggerNotification(
+              appState.timer.title + ' Complete',
+              'Take a moment to reflect or transition to your scheduled break.'
+            );
+            document.title = '🔔 Complete — Focus';
+            return;
+          }
+
+          appState.timer.remainingSeconds = secondsLeft;
+          updateTimerUI();
+          appState.timer.animationFrame = requestAnimationFrame(timerLoop);
+        }
+
+        function startTimer() {
+          initAudioContext();
+          if (appState.timer.remainingSeconds <= 0) {
+            appState.timer.remainingSeconds = appState.timer.totalSeconds;
+          }
+          appState.timer.isRunning = true;
+          appState.timer.endTime = Date.now() + (appState.timer.remainingSeconds * 1000);
+
+          btnTimerPrimaryLabel.textContent = 'Pause';
+          timerStateCaption.textContent = 'Focus in progress';
+
+          cancelAnimationFrame(appState.timer.animationFrame);
+          appState.timer.animationFrame = requestAnimationFrame(timerLoop);
+        }
+
+        function pauseTimer() {
+          if (!appState.timer.isRunning) return;
+          appState.timer.isRunning = false;
+          cancelAnimationFrame(appState.timer.animationFrame);
+
+          // Calculate remaining seconds cleanly
+          const now = Date.now();
+          const msLeft = Math.max(0, appState.timer.endTime - now);
+          appState.timer.remainingSeconds = Math.ceil(msLeft / 1000);
+
+          btnTimerPrimaryLabel.textContent = 'Resume';
+          timerStateCaption.textContent = 'Paused';
+          updateTimerUI();
+        }
+
+        function resetTimer() {
+          pauseTimer();
+          appState.timer.remainingSeconds = appState.timer.totalSeconds;
+          btnTimerPrimaryLabel.textContent = 'Start Focus';
+          timerStateCaption.textContent = 'Ready to focus';
+          updateTimerUI();
+        }
+
+        function extendTimer(secondsToAdd) {
+          appState.timer.totalSeconds += secondsToAdd;
+          appState.timer.remainingSeconds += secondsToAdd;
+          if (appState.timer.isRunning) {
+            appState.timer.endTime += (secondsToAdd * 1000);
+          }
+          updateTimerUI();
+        }
+
+        btnTimerPrimary.addEventListener('click', function () {
+          if (appState.timer.isRunning) {
+            pauseTimer();
+          } else {
+            startTimer();
+          }
+        });
+
+        btnTimerReset.addEventListener('click', resetTimer);
+        btnTimerExtend.addEventListener('click', function () {
+          extendTimer(5 * 60);
+        });
+
+        // --- Presets Handler ---
+        function selectPreset(minutes, title) {
+          pauseTimer();
+          appState.timer.title = title;
+          appState.timer.totalSeconds = minutes * 60;
+          appState.timer.remainingSeconds = minutes * 60;
+
+          activeModeLabel.textContent = title;
+          btnTimerPrimaryLabel.textContent = 'Start ' + title;
+          timerStateCaption.textContent = 'Ready to focus';
+
+          presetCards.forEach(function (card) {
+            const cardMins = parseInt(card.getAttribute('data-mins'), 10);
+            const cardTitle = card.getAttribute('data-title');
+            if (cardMins === minutes && cardTitle === title) {
+              card.classList.add('active');
+            } else {
+              card.classList.remove('active');
+            }
+          });
+
+          // Sync Custom Timer input boxes with selected preset
+          if (customInputHours) customInputHours.value = '00';
+          if (customInputMinutes) customInputMinutes.value = zeroPad(minutes);
+          if (customInputSeconds) customInputSeconds.value = '00';
+          if (customInputTaskName) customInputTaskName.value = title;
+
+          updateTimerUI();
+        }
+
+        presetCards.forEach(function (card) {
+          card.addEventListener('click', function () {
+            const mins = parseInt(card.getAttribute('data-mins'), 10);
+            const title = card.getAttribute('data-title');
+            selectPreset(mins, title);
+          });
+        });
+
+        // --- Custom Timer Interaction & Logic ---
+        function clampNumber(val, min, max) {
+          const num = parseInt(val, 10);
+          if (isNaN(num)) return min;
+          return Math.min(max, Math.max(min, num));
+        }
+
+        function setupTimeUnitInput(inputEl, min, max) {
+          if (!inputEl) return;
+
+          // Select all on focus for instant typing
+          inputEl.addEventListener('focus', function () {
+            this.select();
+          });
+
+          // Format with zero padding and clamp on blur
+          inputEl.addEventListener('blur', function () {
+            const clamped = clampNumber(this.value, min, max);
+            this.value = zeroPad(clamped);
+          });
+
+          // Mouse wheel adjustments
+          inputEl.addEventListener('wheel', function (e) {
+            e.preventDefault();
+            let current = parseInt(this.value, 10) || 0;
+            if (e.deltaY < 0) {
+              current = current + 1 > max ? min : current + 1;
+            } else {
+              current = current - 1 < min ? max : current - 1;
+            }
+            this.value = zeroPad(current);
+          }, { passive: false });
+
+          // Keyboard arrow support & input length restriction
+          inputEl.addEventListener('input', function () {
+            if (this.value.length > 2) {
+              this.value = this.value.slice(-2);
+            }
+          });
+        }
+
+        setupTimeUnitInput(customInputHours, 0, 99);
+        setupTimeUnitInput(customInputMinutes, 0, 59);
+        setupTimeUnitInput(customInputSeconds, 0, 59);
+
+        // Apply Custom Timer Button
+        if (btnSetCustomTimer) {
+          btnSetCustomTimer.addEventListener('click', function () {
+            const h = clampNumber(customInputHours.value, 0, 99);
+            const m = clampNumber(customInputMinutes.value, 0, 59);
+            const s = clampNumber(customInputSeconds.value, 0, 59);
+            let total = (h * 3600) + (m * 60) + s;
+
+            // Prevent zero second timer (default to 1 min if user set 00:00:00)
+            if (total <= 0) {
+              total = 60;
+              customInputMinutes.value = '01';
+            } else {
+              customInputHours.value = zeroPad(h);
+              customInputMinutes.value = zeroPad(m);
+              customInputSeconds.value = zeroPad(s);
+            }
+
+            // Remove active highlight from all preset cards
+            presetCards.forEach(function (c) { c.classList.remove('active'); });
+            pauseTimer();
+
+            // Check optional custom task label
+            const customLabel = (customInputTaskName.value || '').trim();
+            const sessionTitle = customLabel || 'Custom Focus';
+
+            appState.timer.title = sessionTitle;
+            appState.timer.totalSeconds = total;
+            appState.timer.remainingSeconds = total;
+
+            activeModeLabel.textContent = sessionTitle;
+            btnTimerPrimaryLabel.textContent = 'Start Focus';
+            timerStateCaption.textContent = 'Ready to focus';
+
+            updateTimerUI();
+
+            // Smooth scroll up to dial for immediate feedback
+            viewPomodoro.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          });
+        }
+
+        // --- Precision Stopwatch Core (Drift-Free) ---
+        function updateStopwatchUI() {
+          const timeObj = formatStopwatchDigits(appState.stopwatch.elapsedTime);
+          swMajorReadout.textContent = timeObj.major;
+          swMinorReadout.textContent = timeObj.minor;
+          updateStopwatchTitle();
+        }
+
+        function stopwatchLoop() {
+          if (!appState.stopwatch.isRunning) return;
+
+          const now = Date.now();
+          appState.stopwatch.elapsedTime = (now - appState.stopwatch.startTime);
+          updateStopwatchUI();
+
+          appState.stopwatch.animationFrame = requestAnimationFrame(stopwatchLoop);
+        }
+
+        function startStopwatch() {
+          appState.stopwatch.isRunning = true;
+          appState.stopwatch.startTime = Date.now() - appState.stopwatch.elapsedTime;
+
+          btnSwPrimaryLabel.textContent = 'Pause';
+          btnSwLap.removeAttribute('disabled');
+
+          cancelAnimationFrame(appState.stopwatch.animationFrame);
+          appState.stopwatch.animationFrame = requestAnimationFrame(stopwatchLoop);
+        }
+
+        function pauseStopwatch() {
+          if (!appState.stopwatch.isRunning) return;
+          appState.stopwatch.isRunning = false;
+          cancelAnimationFrame(appState.stopwatch.animationFrame);
+
+          btnSwPrimaryLabel.textContent = 'Resume';
+          updateStopwatchUI();
+        }
+
+        function resetStopwatch() {
+          pauseStopwatch();
+          appState.stopwatch.elapsedTime = 0;
+          appState.stopwatch.lastLapTime = 0;
+          appState.stopwatch.laps = [];
+
+          btnSwPrimaryLabel.textContent = 'Start';
+          btnSwLap.setAttribute('disabled', 'true');
+
+          renderLaps();
+          updateStopwatchUI();
+        }
+
+        function recordLap() {
+          if (!appState.stopwatch.isRunning) return;
+          const currentElapsed = appState.stopwatch.elapsedTime;
+          const lapSplit = currentElapsed - appState.stopwatch.lastLapTime;
+          appState.stopwatch.lastLapTime = currentElapsed;
+
+          appState.stopwatch.laps.unshift({
+            lapNumber: appState.stopwatch.laps.length + 1,
+            split: lapSplit,
+            total: currentElapsed
+          });
+
+          renderLaps();
+        }
+
+        function renderLaps() {
+          const laps = appState.stopwatch.laps;
+          if (laps.length === 0) {
+            lapTableBox.classList.remove('has-laps');
+            lapRowsContainer.innerHTML = '';
+            return;
+          }
+
+          lapTableBox.classList.add('has-laps');
+
+          // Determine fastest and slowest
+          let minSplit = Infinity;
+          let maxSplit = -Infinity;
+
+          if (laps.length >= 2) {
+            laps.forEach(function (l) {
+              if (l.split < minSplit) minSplit = l.split;
+              if (l.split > maxSplit) maxSplit = l.split;
+            });
+          }
+
+          let html = '';
+          laps.forEach(function (lap) {
+            let badgeClass = '';
+            if (laps.length >= 2) {
+              if (lap.split === minSplit) badgeClass = 'fastest';
+              else if (lap.split === maxSplit) badgeClass = 'slowest';
+            }
+
+            const splitDigits = formatStopwatchDigits(lap.split);
+            const totalDigits = formatStopwatchDigits(lap.total);
+
+            html += '<div class="lap-row ' + badgeClass + '">' +
+              '<span>Lap ' + zeroPad(lap.lapNumber) + '</span>' +
+              '<span>' + splitDigits.major + splitDigits.minor + '</span>' +
+              '<span>' + totalDigits.major + totalDigits.minor + '</span>' +
+            '</div>';
+          });
+
+          lapRowsContainer.innerHTML = html;
+        }
+
+        btnSwPrimary.addEventListener('click', function () {
+          if (appState.stopwatch.isRunning) {
+            pauseStopwatch();
+          } else {
+            startStopwatch();
+          }
+        });
+
+        btnSwReset.addEventListener('click', resetStopwatch);
+        btnSwLap.addEventListener('click', recordLap);
+
+        // --- Global Keyboard Shortcuts ---
+        document.addEventListener('keydown', function (e) {
+          // Avoid triggering when focused inside numeric inputs
+          if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+            return;
+          }
+
+          if (e.code === 'Space') {
+            e.preventDefault();
+            if (appState.currentTab === 'pomodoro') {
+              if (appState.timer.isRunning) pauseTimer();
+              else startTimer();
+            } else {
+              if (appState.stopwatch.isRunning) pauseStopwatch();
+              else startStopwatch();
+            }
+          } else if (e.code === 'KeyR') {
+            if (appState.currentTab === 'pomodoro') {
+              resetTimer();
+            } else {
+              resetStopwatch();
+            }
+          } else if (e.code === 'KeyL') {
+            if (appState.currentTab === 'stopwatch') {
+              recordLap();
+            }
+          }
+        });
+
+        // --- Initialization ---
+        applyTheme(appState.theme);
+        setSoundEnabled(appState.soundEnabled);
+        if ('Notification' in window && Notification.permission === 'granted') {
+          updateNotificationIcon(true);
+        }
+        updateTimerUI();
+        updateStopwatchUI();
+      })();
+    </script>
+  </body>
+</html>

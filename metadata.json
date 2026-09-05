@@ -1,0 +1,6 @@
+{
+  "name": "Focus Timer",
+  "description": "Online Pomodoro timer and precision stopwatch web tool with customizable presets, audio alerts, and background tab support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
