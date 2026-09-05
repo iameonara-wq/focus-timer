@@ -12,6 +12,9 @@
     <meta name="theme-color" content="#000000" />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%230066cc'/><polygon points='40,32 70,50 40,68' fill='white'/></svg>" />
 
+    <!-- Google AdSense SDK -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9818588694915701" crossorigin="anonymous"></script>
+
     <style>
       /* ==========================================================================
          Apple Design System Specification
@@ -199,66 +202,21 @@
       }
 
       /* ==========================================================================
-         AdSense Areas
+         Google AdSense Responsive Containers
          ========================================================================== */
-      .adsense-container {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .adsense-leaderboard {
+      .ad-container-top,
+      .ad-container-bottom {
         width: 100%;
         max-width: 728px;
         min-height: 90px;
-        background-color: var(--apple-canvas);
-        border: 1px solid var(--apple-border-light);
         border-radius: 12px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 8px 16px;
-        text-align: center;
+        box-sizing: border-box;
+        overflow: hidden;
       }
 
-      .adsense-badge {
-        font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: var(--apple-fine-print);
-        margin-bottom: 2px;
-      }
-
-      .adsense-title {
-        font-size: 13px;
-        color: var(--apple-ink-secondary);
-        font-weight: 400;
-      }
-
-      .adsense-subtext {
-        font-size: 11px;
-        color: var(--apple-fine-print);
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        margin-top: 2px;
-      }
-
-      .adsense-rectangle {
-        width: 100%;
-        max-width: 728px;
-        min-height: 100px;
-        background-color: var(--apple-canvas);
-        border: 1px solid var(--apple-border-light);
-        border-radius: 12px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 12px 16px;
-        text-align: center;
+      .ad-container-top ins.adsbygoogle,
+      .ad-container-bottom ins.adsbygoogle {
+        border-radius: 8px;
       }
 
       /* ==========================================================================
@@ -1118,24 +1076,19 @@
 
     <main class="main-viewport">
       <!-- ==========================================================================
-           GOOGLE ADSENSE TOP LEADERBOARD (728x90)
+           GOOGLE ADSENSE TOP BANNER (Auto Responsive / Slot: 3941660680)
            ========================================================================== -->
-      <section class="adsense-container" id="adsense-top-slot" aria-label="Advertisement Banner">
-        <!-- 
-        To insert live AdSense script:
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+      <div class="ad-container-top" style="margin: 24px auto 32px; text-align: center; max-width: 728px; width: 100%; min-height: 90px; overflow: hidden;">
         <ins class="adsbygoogle"
-             style="display:inline-block;width:728px;height:90px"
-             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-             data-ad-slot="XXXXXXXXXX"></ins>
-        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-        -->
-        <div class="adsense-leaderboard" id="ad-placeholder-top">
-          <span class="adsense-badge">Advertisement</span>
-          <span class="adsense-title">Google AdSense Leaderboard (728 × 90 Responsive)</span>
-          <span class="adsense-subtext">&lt;!-- GOOGLE ADSENSE TOP LEADERBOARD (728x90) --&gt;</span>
-        </div>
-      </section>
+             style="display:block"
+             data-ad-client="ca-pub-9818588694915701"
+             data-ad-slot="3941660680"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
 
       <!-- Mode Segmented Control Bar -->
       <nav class="mode-segmented-bar" id="mode-selector" aria-label="Timer Mode Switcher">
@@ -1392,26 +1345,19 @@
       </section>
 
       <!-- ==========================================================================
-           GOOGLE ADSENSE BOTTOM RECTANGLE (Responsive 300x250 or 728x90)
+           GOOGLE ADSENSE BOTTOM BANNER (Auto Responsive / Slot: 8918655193)
            ========================================================================== -->
-      <section class="adsense-container" id="adsense-bottom-slot" aria-label="Advertisement Display">
-        <!-- 
-        To insert live AdSense script:
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+      <div class="ad-container-bottom" style="margin: 40px auto 24px; text-align: center; max-width: 728px; width: 100%; min-height: 90px; overflow: hidden;">
         <ins class="adsbygoogle"
              style="display:block"
-             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-             data-ad-slot="XXXXXXXXXX"
+             data-ad-client="ca-pub-9818588694915701"
+             data-ad-slot="8918655193"
              data-ad-format="auto"
              data-full-width-responsive="true"></ins>
-        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-        -->
-        <div class="adsense-rectangle" id="ad-placeholder-bottom">
-          <span class="adsense-badge">Advertisement</span>
-          <span class="adsense-title">Google AdSense Responsive Unit (300 × 250 or Responsive Display)</span>
-          <span class="adsense-subtext">&lt;!-- GOOGLE ADSENSE BOTTOM RECTANGLE --&gt;</span>
-        </div>
-      </section>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
     </main>
 
     <!-- ==========================================================================
