@@ -1040,6 +1040,289 @@
           align-items: flex-start;
         }
       }
+
+      /* ==========================================================================
+         Pomodoro Guide & FAQ Editorial Section (#ffffff Canvas / #272729 Dark Tile)
+         ========================================================================== */
+      .guide-tile {
+        background-color: var(--apple-canvas);
+        border: 1px solid var(--apple-border-light);
+        border-radius: 18px;
+        padding: 36px 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+        box-shadow: var(--apple-display-shadow);
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+      }
+
+      html.dark-theme .guide-tile {
+        background-color: var(--apple-dark-tile);
+        border-color: var(--apple-border-dark);
+      }
+
+      .guide-header {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        border-bottom: 1px solid var(--apple-border-light);
+        padding-bottom: 20px;
+      }
+
+      html.dark-theme .guide-header {
+        border-bottom-color: var(--apple-border-dark);
+      }
+
+      .guide-eyebrow {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--apple-accent);
+      }
+
+      .guide-headline {
+        font-size: 23px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--apple-ink);
+        line-height: 1.3;
+      }
+
+      html.dark-theme .guide-headline {
+        color: var(--apple-text-dark);
+      }
+
+      .guide-subheadline {
+        font-size: 14.5px;
+        color: var(--apple-ink-secondary);
+        line-height: 1.6;
+      }
+
+      html.dark-theme .guide-subheadline {
+        color: var(--apple-text-dark-muted);
+      }
+
+      .guide-section {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .guide-section-title-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .guide-section-icon {
+        width: 20px;
+        height: 20px;
+        color: var(--apple-accent);
+        flex-shrink: 0;
+      }
+
+      .guide-section-title {
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: -0.015em;
+        color: var(--apple-ink);
+      }
+
+      html.dark-theme .guide-section-title {
+        color: var(--apple-text-dark);
+      }
+
+      .guide-prose {
+        font-size: 14.5px;
+        line-height: 1.7;
+        color: var(--apple-ink-secondary);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      html.dark-theme .guide-prose {
+        color: var(--apple-text-dark-muted);
+      }
+
+      .guide-prose strong {
+        color: var(--apple-ink);
+        font-weight: 600;
+      }
+
+      html.dark-theme .guide-prose strong {
+        color: #ffffff;
+      }
+
+      /* 4-Step Routine Grid */
+      .routine-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+        margin-top: 4px;
+      }
+
+      .routine-card {
+        background-color: var(--apple-parchment);
+        border: 1px solid var(--apple-border-light);
+        border-radius: 14px;
+        padding: 18px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        transition: transform 0.15s ease, border-color 0.15s ease;
+      }
+
+      .routine-card:hover {
+        border-color: var(--apple-accent);
+        transform: translateY(-2px);
+      }
+
+      html.dark-theme .routine-card {
+        background-color: var(--apple-dark-tile-subtle);
+        border-color: var(--apple-border-dark);
+      }
+
+      html.dark-theme .routine-card:hover {
+        border-color: var(--apple-accent-on-dark);
+      }
+
+      .routine-card-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .routine-step-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 7px;
+        background-color: var(--apple-accent-light);
+        color: var(--apple-accent);
+        font-size: 12px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        flex-shrink: 0;
+      }
+
+      html.dark-theme .routine-step-badge {
+        color: var(--apple-accent-on-dark);
+      }
+
+      .routine-step-title {
+        font-size: 14.5px;
+        font-weight: 600;
+        color: var(--apple-ink);
+        letter-spacing: -0.01em;
+      }
+
+      html.dark-theme .routine-step-title {
+        color: var(--apple-text-dark);
+      }
+
+      .routine-step-desc {
+        font-size: 13.5px;
+        line-height: 1.55;
+        color: var(--apple-ink-secondary);
+      }
+
+      html.dark-theme .routine-step-desc {
+        color: var(--apple-text-dark-muted);
+      }
+
+      /* FAQ List with Apple Clean Cards */
+      .faq-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .faq-item {
+        background-color: var(--apple-parchment);
+        border: 1px solid var(--apple-border-light);
+        border-radius: 12px;
+        padding: 16px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        transition: border-color 0.15s ease;
+      }
+
+      html.dark-theme .faq-item {
+        background-color: var(--apple-dark-tile-subtle);
+        border-color: var(--apple-border-dark);
+      }
+
+      .faq-question {
+        font-size: 14.5px;
+        font-weight: 600;
+        color: var(--apple-ink);
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        line-height: 1.45;
+      }
+
+      html.dark-theme .faq-question {
+        color: var(--apple-text-dark);
+      }
+
+      .faq-q-mark {
+        color: var(--apple-accent);
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+
+      .faq-answer {
+        font-size: 13.5px;
+        line-height: 1.6;
+        color: var(--apple-ink-secondary);
+        padding-left: 18px;
+      }
+
+      html.dark-theme .faq-answer {
+        color: var(--apple-text-dark-muted);
+      }
+
+      .faq-answer strong {
+        color: var(--apple-ink);
+        font-weight: 600;
+      }
+
+      html.dark-theme .faq-answer strong {
+        color: #ffffff;
+      }
+
+      .faq-answer code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 12px;
+        background-color: rgba(0, 0, 0, 0.05);
+        padding: 2px 5px;
+        border-radius: 4px;
+      }
+
+      html.dark-theme .faq-answer code {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      @media (max-width: 640px) {
+        .guide-tile {
+          padding: 24px 16px;
+          gap: 24px;
+        }
+
+        .guide-headline {
+          font-size: 19px;
+        }
+
+        .routine-grid {
+          grid-template-columns: 1fr;
+        }
+      }
     </style>
   </head>
   <body>
@@ -1364,6 +1647,137 @@
             Set Custom Timer
           </button>
         </div>
+      </section>
+
+      <!-- ==========================================================================
+           POMODORO USER GUIDE & SCIENTIFIC METHODOLOGY (Apple HIG Editorial Tile)
+           ========================================================================== -->
+      <section class="guide-tile" id="guide-section" aria-label="Pomodoro Technique Guide and FAQ">
+        <div class="guide-header">
+          <span class="guide-eyebrow">Productivity &amp; Focus Guide</span>
+          <h2 class="guide-headline">The Science of Focus: Mastering the Pomodoro Technique</h2>
+          <p class="guide-subheadline">
+            A proven cognitive framework designed to sustain deep work, eliminate mental fatigue, and optimize your daily workflow.
+          </p>
+        </div>
+
+        <!-- Section 1: What is the Pomodoro Technique? -->
+        <article class="guide-section">
+          <div class="guide-section-title-row">
+            <svg class="guide-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <h3 class="guide-section-title">What is the Pomodoro Technique?</h3>
+          </div>
+          <div class="guide-prose">
+            <p>
+              The <strong>Pomodoro Technique</strong> is an acclaimed time management framework developed by Italian university student <strong>Francesco Cirillo</strong> in the late 1980s. Faced with task overwhelm and study burnout, Cirillo challenged himself to dedicate just 10 minutes of pure, uninterrupted concentration using a tomato-shaped kitchen timer (<em>pomodoro</em> is Italian for tomato). He soon refined this into the classic 25-minute focus block, discovering that deliberate bursts of attention dramatically improved information retention and execution speed.
+            </p>
+            <p>
+              Modern cognitive neuroscience confirms that peak human focus naturally tapers off after 20 to 30 minutes due to attentional fatigue and mental friction. Attempting to power through prolonged exhaustion induces "attention residue" and multiplies errors. By systematically alternating <strong>25 minutes of deep, distraction-free work</strong> with <strong>5-minute restorative breaks</strong>, the Pomodoro method aligns with your brain's natural ultradian rhythm, preserving sharp mental clarity and steady momentum throughout the day without burnout.
+            </p>
+          </div>
+        </article>
+
+        <!-- Section 2: 4-Step Routine -->
+        <article class="guide-section">
+          <div class="guide-section-title-row">
+            <svg class="guide-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            <h3 class="guide-section-title">4-Step Routine to Master Your Focus</h3>
+          </div>
+          <div class="guide-prose">
+            <p>
+              Transform your productivity by practicing this structured, four-step routine for every work cycle:
+            </p>
+          </div>
+          <div class="routine-grid">
+            <div class="routine-card">
+              <div class="routine-card-header">
+                <span class="routine-step-badge">01</span>
+                <h4 class="routine-step-title">Choose a Single Task</h4>
+              </div>
+              <p class="routine-step-desc">
+                Select one clear, high-priority objective to accomplish. Multitasking drains working memory, so set aside all secondary obligations and commit the next 25 minutes exclusively to this single pursuit.
+              </p>
+            </div>
+
+            <div class="routine-card">
+              <div class="routine-card-header">
+                <span class="routine-step-badge">02</span>
+                <h4 class="routine-step-title">Immerse Without Multitasking</h4>
+              </div>
+              <p class="routine-step-desc">
+                Tap the [Pomodoro 25m] button and silence non-critical notifications. Enter a pure flow state without checking email, social feeds, or browser tabs until the countdown finishes.
+              </p>
+            </div>
+
+            <div class="routine-card">
+              <div class="routine-card-header">
+                <span class="routine-step-badge">03</span>
+                <h4 class="routine-step-title">Step Away for 5 Minutes</h4>
+              </div>
+              <p class="routine-step-desc">
+                When the harmonic chime rings, disengage from your display immediately. Stretch, hydrate, or look out into the distance to allow your brain's Default Mode Network (DMN) to relax and consolidate thoughts.
+              </p>
+            </div>
+
+            <div class="routine-card">
+              <div class="routine-card-header">
+                <span class="routine-step-badge">04</span>
+                <h4 class="routine-step-title">Take a Longer Restorative Pause</h4>
+              </div>
+              <p class="routine-step-desc">
+                After completing four consecutive focus cycles (roughly two hours of deep work), reward yourself with a 15–30 minute [Long Break]. Take a walk or enjoy tea to fully recharge cognitive stamina.
+              </p>
+            </div>
+          </div>
+        </article>
+
+        <!-- Section 3: FAQ -->
+        <article class="guide-section">
+          <div class="guide-section-title-row">
+            <svg class="guide-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <h3 class="guide-section-title">Frequently Asked Questions</h3>
+          </div>
+          <div class="faq-list">
+            <div class="faq-item">
+              <div class="faq-question">
+                <span class="faq-q-mark">Q.</span>
+                <span>Does the timer run in background tabs?</span>
+              </div>
+              <p class="faq-answer">
+                <strong>Yes, with drift-free precision.</strong> While standard web timers can slow down when browsers throttle inactive tabs to save power, Focus employs high-precision hardware timestamps (<code>performance.now()</code>). Your countdown remains accurate down to the millisecond, and your active session time is reflected in real time directly inside your browser tab title.
+              </p>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-question">
+                <span class="faq-q-mark">Q.</span>
+                <span>Can I customize the session intervals?</span>
+              </div>
+              <p class="faq-answer">
+                <strong>Yes, seamlessly.</strong> Use the one-tap presets for <strong>25m Pomodoro</strong>, <strong>5m Short Break</strong>, <strong>15m Long Break</strong>, or <strong>50m Deep Work</strong>. You can also utilize the <strong>Custom Timer</strong> section directly below to configure exact hours, minutes, and seconds along with your custom task label (e.g., "Reading", "Writing Sprint").
+              </p>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-question">
+                <span class="faq-q-mark">Q.</span>
+                <span>What should I do if the completion audio chime doesn't play?</span>
+              </div>
+              <p class="faq-answer">
+                Modern browsers adhere to strict audio autoplay policies requiring at least one initial user interaction on the page before web audio can emit sound. Ensure you have clicked any button (such as Start or a preset), verify that the speaker icon in the top navigation bar is active, and ensure your device or system audio is unmuted.
+              </p>
+            </div>
+          </div>
+        </article>
       </section>
 
       <!-- ==========================================================================
